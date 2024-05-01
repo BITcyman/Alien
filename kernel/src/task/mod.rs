@@ -17,6 +17,7 @@ use spin::Lazy;
 pub use task::{StatisticalData, Task, TaskState};
 use timer::get_time_ms;
 
+
 mod context;
 mod cpu;
 mod heap;
@@ -35,9 +36,11 @@ pub static INIT_PROCESS: Lazy<Arc<Task>> = Lazy::new(|| {
 });
 
 /// 将初始进程加入进程池中进行调度
-pub fn init_task() {
+pub async fn init_task() {
     kthread::ktread_create(kthread_init, "kthread_test").unwrap();
-    println!("Init task success");
+    println!("Init sync task success");
+    // kthread::ktread_create(async_test, "async_test").unwrap();
+    // println!("Init async task success");
 }
 
 fn kthread_init() {

@@ -13,10 +13,10 @@ macro_rules! print {
 /// 系统启动初期使用的输出函数
 #[macro_export]
 macro_rules! println {
-    () => ($crate::print!("\n"));
-    ($fmt:expr) => ($crate::print!(concat!($fmt, "\n")));
+    () => ($crate::print!("\r\n"));
+    ($fmt:expr) => ($crate::print!(concat!($fmt, "\r\n")));
     ($fmt:expr, $($arg:tt)*) => ($crate::print!(
-        concat!($fmt, "\n"), $($arg)*));
+        concat!($fmt, "\r\n"), $($arg)*));
 }
 
 pub struct Stdout;

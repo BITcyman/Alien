@@ -23,6 +23,8 @@ vfscore = { git = "https://github.com/os-module/rvfs.git", features = [
 ] }
 
 virtio-drivers = { git = "https://github.com/rcore-os/virtio-drivers",rev = "de1c3b1" }
+async-uart-driver = { path = "../../../os/async-uart-driver/" }
+heapless = "0.7.5"
 netcore = { git = "https://github.com/os-module/simple-net" }
 
 

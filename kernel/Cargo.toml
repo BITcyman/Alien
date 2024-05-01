@@ -12,6 +12,10 @@ mem = { path = "../subsystems/mem" }
 interrupt = { path = "../subsystems/interrupt" }
 devices = { path = "../subsystems/devices" }
 drivers = { path = "../subsystems/drivers" }
+embassy-executor = { version = "0.3.2", features = ["arch-riscv32", "nightly", "executor-thread"] }
+async-uart-driver = { path = "../../os/async-uart-driver/" }
+heapless = "0.7.5"
+static_cell = "2.0.0"
 unwinder = { path = "../subsystems/unwinder" }
 constants = { path = "../subsystems/constants" }
 config = { path = "../subsystems/config" }
@@ -24,7 +28,7 @@ shim = { path = "../subsystems/shim", features = ["kernel"]}
 
 
 
-riscv = "0.10"
+riscv = { version = "0.10.1", features = ["critical-section-single-hart"] }
 bit_field = "0.10"
 xmas-elf = "0.9"
 bitflags = "1.3"

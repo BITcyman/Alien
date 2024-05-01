@@ -1,5 +1,6 @@
 #![feature(atomic_from_mut)]
 #![feature(ip_in_core)]
+#![feature(type_alias_impl_trait)]
 #![no_std]
 #![no_main]
 
@@ -33,6 +34,20 @@ static STARTED: AtomicBool = AtomicBool::new(false);
 
 #[no_mangle]
 fn main(hart_id: usize) {
+    let executor = EXECUTOR.init(Executor::new());
+    executor.run(|spawner| {
+        spawner.spawn(kernel_init(spawner, hart_id)).unwrap();
+    });
+}
+
+use embassy_executor::Executor;
+use embassy_executor::Spawner;
+use static_cell::StaticCell;
+
+static EXECUTOR: StaticCell<Executor> = StaticCell::new();
+
+#[embassy_executor::task]
+async fn kernel_init(spawner: Spawner, hart_id: usize){
     if STARTED
         .compare_exchange(false, true, Ordering::Relaxed, Ordering::Relaxed)
         .is_ok()
@@ -47,7 +62,7 @@ fn main(hart_id: usize) {
         vfs::init_filesystem().expect("init filesystem failed");
         trap::init_trap_subsystem();
         arch::allow_access_user_memory();
-        task::init_task();
+        task::init_task().await;
         // register all syscall
         syscall_table::init_init_array!();
         STARTED.store(false, Ordering::Relaxed);
@@ -61,6 +76,23 @@ fn main(hart_id: usize) {
         println!("hart {} start", arch::hart_id());
     }
     time::set_next_trigger();
+    test().await;
     println!("Begin run task...");
     task::schedule::run_task();
+}
+
+
+async fn test(){
+    let f1 = async {
+        println!("========= async test f1 ==============");
+    };
+    let f2 = async {
+        println!("========= async test f2 ==============");
+    };
+    let f3 = async {
+        println!("========= async test f3 ==============");
+    };
+    f3.await;
+    f2.await;
+    f1.await;
 }

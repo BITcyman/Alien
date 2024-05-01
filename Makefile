@@ -1,3 +1,6 @@
+QEMU := ../os/myqemu/qemu-build/riscv64-softmmu/qemu-system-riscv64
+SERIAL_CONFIG := -serial /dev/pts/11 -serial /dev/pts/6 -serial /dev/pts/14
+
 TRACE_EXE  	:= trace_exe
 EXTMKFS	:= lwext4-mkfs
 TARGET      := riscv64gc-unknown-none-elf
@@ -7,8 +10,8 @@ DEBUG_FILE  ?= $(KERNEL_FILE)
 KERNEL_ENTRY_PA := 0x80200000
 OBJDUMP     := rust-objdump --arch-name=riscv64
 OBJCOPY     := rust-objcopy --binary-architecture=riscv64
-BOOTLOADER  := ./boot/rustsbi-qemu.bin
-BOOTLOADER  := default
+BOOTLOADER  := rustsbi-qemu.bin
+# BOOTLOADER  := default
 KERNEL_BIN  := $(KERNEL_FILE).bin
 IMG := tools/sdcard.img
 FSMOUNT := ./diskfs
@@ -83,7 +86,7 @@ endif
 FEATURES := $(subst $(space),$(comma),$(FEATURES))
 
 define boot_qemu
-	qemu-system-riscv64 \
+	$(QEMU) \
         -M virt $(1)\
         -bios $(BOOTLOADER) \
         -drive file=$(IMG),if=none,format=raw,id=x0 \
@@ -91,9 +94,10 @@ define boot_qemu
         -kernel  kernel-qemu\
         -$(QEMU_ARGS) \
         -smp $(SMP) -m $(MEMORY_SIZE) \
-        -serial mon:stdio
+		$(SERIAL_CONFIG)
 endef
 
+#  -serial mon:stdio
 all:
 
 install:

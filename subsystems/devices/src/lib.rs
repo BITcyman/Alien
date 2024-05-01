@@ -44,9 +44,15 @@ pub struct DeviceInfo {
 /// Before init device, we should init platform first.
 ///
 pub fn init_device() {
+    println!("init device start");
     let dtb_ptr = platform::platform_dtb_ptr();
 
     let dtb = unsafe { Fdt::from_ptr(dtb_ptr as *const u8).unwrap() };
+    
+    for node in dtb.all_nodes() {
+        println!("    {}", node.name);
+    }
+
     match dtb.probe_rtc() {
         Some(rtc) => init_rtc(rtc),
         None => {
@@ -120,10 +126,11 @@ fn init_uart(uart: prob::DeviceInfo) {
     match uart.compatible.as_str() {
         "ns16550a" => {
             // qemu
+            println!("This is qemu");
             let uart = Uart16550::new(base_addr);
             let uart = Arc::new(Uart::new(Box::new(uart)));
             uart::init_uart(uart.clone());
-            register_device_to_plic(irq, uart);
+            register_device_to_plic(irq, uart);            
         }
         "snps,dw-apb-uart" => {
             // vf2
