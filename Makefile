@@ -1,5 +1,5 @@
 QEMU := ../os/myqemu/qemu-build/riscv64-softmmu/qemu-system-riscv64
-SERIAL_CONFIG := -serial /dev/pts/11 -serial /dev/pts/6 -serial /dev/pts/14
+SERIAL_CONFIG := -serial /dev/pts/5 -serial /dev/pts/12 -serial /dev/pts/7
 
 TRACE_EXE  	:= trace_exe
 EXTMKFS	:= lwext4-mkfs
@@ -10,13 +10,13 @@ DEBUG_FILE  ?= $(KERNEL_FILE)
 KERNEL_ENTRY_PA := 0x80200000
 OBJDUMP     := rust-objdump --arch-name=riscv64
 OBJCOPY     := rust-objcopy --binary-architecture=riscv64
-BOOTLOADER  := rustsbi-qemu.bin
-# BOOTLOADER  := default
+# BOOTLOADER  := rustsbi-qemu.bin
+BOOTLOADER  := default
 KERNEL_BIN  := $(KERNEL_FILE).bin
 IMG := tools/sdcard.img
 FSMOUNT := ./diskfs
 TFTPBOOT := /home/godones/projects/tftpboot/
-SMP ?= 1
+SMP := 2
 GUI ?=n
 NET ?=y
 #IMG1 := tools/fs1.img

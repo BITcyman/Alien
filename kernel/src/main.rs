@@ -34,10 +34,8 @@ static STARTED: AtomicBool = AtomicBool::new(false);
 
 #[no_mangle]
 fn main(hart_id: usize) {
-    let executor = EXECUTOR.init(Executor::new());
-    executor.run(|spawner| {
-        spawner.spawn(kernel_init(spawner, hart_id)).unwrap();
-    });
+    kernel_init(hart_id)
+    
 }
 
 use embassy_executor::Executor;
@@ -46,8 +44,7 @@ use static_cell::StaticCell;
 
 static EXECUTOR: StaticCell<Executor> = StaticCell::new();
 
-#[embassy_executor::task]
-async fn kernel_init(spawner: Spawner, hart_id: usize){
+fn kernel_init(hart_id: usize){
     if STARTED
         .compare_exchange(false, true, Ordering::Relaxed, Ordering::Relaxed)
         .is_ok()
@@ -62,7 +59,7 @@ async fn kernel_init(spawner: Spawner, hart_id: usize){
         vfs::init_filesystem().expect("init filesystem failed");
         trap::init_trap_subsystem();
         arch::allow_access_user_memory();
-        task::init_task().await;
+        task::init_task();
         // register all syscall
         syscall_table::init_init_array!();
         STARTED.store(false, Ordering::Relaxed);
@@ -74,12 +71,72 @@ async fn kernel_init(spawner: Spawner, hart_id: usize){
         arch::allow_access_user_memory();
         trap::init_trap_subsystem();
         println!("hart {} start", arch::hart_id());
+
+        let executor = EXECUTOR.init(Executor::new());
+        executor.run(|spawner| {
+            spawner.spawn(async_test(spawner)).unwrap();
+        });
+        
     }
     time::set_next_trigger();
-    test().await;
     println!("Begin run task...");
     task::schedule::run_task();
 }
+
+// #[embassy_executor::task]
+// async fn kernel_init(spawner: Spawner, hart_id: usize){
+//     if STARTED
+//         .compare_exchange(false, true, Ordering::Relaxed, Ordering::Relaxed)
+//         .is_ok()
+//     {
+//         println!("Boot hart {}", hart_id);
+//         let machine_info = platform_machine_info();
+//         println!("{:#?}", machine_info);
+//         mem::init_memory_system(machine_info.memory.end, true);
+//         interrupt::init_plic(machine_info.plic.start);
+//         shim::register_task_func(Box::new(DriverTaskImpl));
+//         devices::init_device();
+//         vfs::init_filesystem().expect("init filesystem failed");
+//         trap::init_trap_subsystem();
+//         arch::allow_access_user_memory();
+//         task::init_task().await;
+//         // register all syscall
+//         syscall_table::init_init_array!();
+//         STARTED.store(false, Ordering::Relaxed);
+//     } else {
+//         while STARTED.load(Ordering::Relaxed) {
+//             spin_loop();
+//         }
+//         mem::init_memory_system(0, false);
+//         arch::allow_access_user_memory();
+//         trap::init_trap_subsystem();
+//         println!("hart {} start", arch::hart_id());
+//         test().await;
+
+//         loop {
+
+//         }
+//     }
+//     time::set_next_trigger();
+//     println!("Begin run task...");
+//     task::schedule::run_task();
+// }
+
+
+#[embassy_executor::task]
+async fn async_test(_spawner: Spawner) {
+    test().await;
+    uart_driver_init().await;
+
+    loop {
+
+    }
+}
+
+async fn uart_driver_init(){
+    println!("driver_init");
+    devices::init_async_uart().await;
+}   
 
 
 async fn test(){

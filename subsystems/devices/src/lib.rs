@@ -7,6 +7,8 @@ mod net;
 mod prob;
 mod rtc;
 mod uart;
+mod asyncuart;
+pub use asyncuart::*;
 
 extern crate alloc;
 

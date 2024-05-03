@@ -32,6 +32,8 @@ pub trait Probe {
     /// Get the base address and irq number of the virtio devices from the device tree.
     fn probe_virtio(&self) -> Option<Vec<DeviceInfo>>;
     fn probe_common(&self, device_name: &str) -> Option<DeviceInfo>;
+    fn probe_serial(&self) -> Option<DeviceInfo>;
+    
     #[cfg(feature = "vf2")]
     fn probe_sdio(&self) -> Option<DeviceInfo> {
         self.probe_common("sdio1")
@@ -42,9 +44,18 @@ impl Probe for Fdt<'_> {
     fn probe_uart(&self) -> Option<DeviceInfo> {
         match self.probe_common("uart") {
             Some(device_info) => Some(device_info),
-            None => self.probe_common("serial"),
+            // None => self.probe_common("serial"),
+            None => None
         }
     }
+
+    fn probe_serial(&self) -> Option<DeviceInfo> {
+        match self.probe_common("serial") {
+            Some(device_info) => Some(device_info),
+            None => None,
+        }
+    }
+
 
     fn probe_rtc(&self) -> Option<DeviceInfo> {
         self.probe_common("rtc")

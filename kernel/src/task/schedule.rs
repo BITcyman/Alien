@@ -26,6 +26,7 @@ pub fn run_task() -> ! {
         let cpu = current_cpu();
         if cpu.task.is_some() {
             let task = cpu.task.take().unwrap();
+            // println!("current task tid is {}", task.get_tid());
             match task.state() {
                 TaskState::Waiting => {
                     // drop(task);
@@ -55,6 +56,7 @@ pub fn run_task() -> ! {
             // }
             // update state to running
             task.inner().update_state(TaskState::Running);
+            // println!("the picked task tid: {}", task.get_tid());
             // get the process context
             let context = task.inner().get_context_raw_ptr();
             cpu.task = Some(task.inner().clone());

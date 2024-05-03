@@ -170,6 +170,7 @@ pub fn exit_group(exit_code: i32) -> isize {
 #[syscall_func(124)]
 pub fn do_suspend() -> isize {
     let task = current_task().unwrap();
+    // println!("the current task's tid is {}", task.get_tid());
     task.access_inner().update_timer();
     check_task_timer_expired();
     task.update_state(TaskState::Ready);
