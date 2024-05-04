@@ -36,11 +36,17 @@ impl AsyncSerialDevice {
             inner,
         }
     }
+
+    pub fn get_inner(&self) -> Arc<AsyncSerial> {
+        self.inner.clone()
+    }
 }
 
 pub static ASYNC_SERIAL_DEVICE: Once<Arc<AsyncSerialDevice>> = Once::new();
 const BAUD_RATE: usize = 6_250_000;
 
+const LOOP_TIME: usize = 2;    
+const HALF_FIFO_DEPTH: usize = 20;
 
 pub fn init_async_serial(async_serial: Arc<AsyncSerialDevice>) {
     ASYNC_SERIAL_DEVICE.call_once(|| async_serial);
@@ -72,6 +78,7 @@ pub async fn init_async_uart(){
                 tx_con
             );
             let async_serial = Arc::new(async_serial);
+            println!("before hardware_init");
             async_serial.hardware_init(BAUD_RATE);
             let async_serial_device = Arc::new(
                 AsyncSerialDevice::new(async_serial)
@@ -79,15 +86,16 @@ pub async fn init_async_uart(){
             init_async_serial(async_serial_device.clone());
             register_device_to_plic(irq, async_serial_device.clone());
 
-            static WRITE_BUF: [u8;10] = [1,2,3,4,5,6,7,8,9,10];
-            static mut READ_BUF:[u8;6] =  [0; 6];
-            async_serial_device.clone().inner.clone().read( unsafe {
-                &mut READ_BUF
-            }).await;
-            async_serial_device.clone().inner.clone().write(&WRITE_BUF).await;
-            
-            println!("{:?}", unsafe {& mut READ_BUF} );
-
+            static WRITE_BUF: [u8;12] = [65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76];
+            static mut READ_BUF:[u8;12] =  [0; 12];
+            for _ in 0..LOOP_TIME {
+                println!("before write");
+                async_serial_device.get_inner().write(&WRITE_BUF as &[u8]).await;
+                async_serial_device.get_inner().read( unsafe {
+                    &mut READ_BUF
+                }).await;
+                println!("{:?}", unsafe {& mut READ_BUF} );
+            }
         },
         None => {
             println!("There is no serial device");
