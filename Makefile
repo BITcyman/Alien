@@ -1,5 +1,8 @@
 QEMU := ../os/myqemu/qemu-build/riscv64-softmmu/qemu-system-riscv64
-SERIAL_CONFIG := -serial /dev/pts/4 -serial /dev/pts/5 -serial /dev/pts/7 -serial /dev/pts/8 -serial /dev/pts/14
+SERIAL_CONFIG := -serial /dev/pts/4 -serial /dev/pts/7 -serial /dev/pts/5 -serial /dev/pts/8 -serial /dev/pts/10
+
+# QEMU := qemu-system-riscv64s
+# SERIAL_CONFIG := -serial mon:stdio
 
 TRACE_EXE  	:= trace_exe
 EXTMKFS	:= lwext4-mkfs
@@ -97,7 +100,7 @@ define boot_qemu
 		$(SERIAL_CONFIG)
 endef
 
-#  -serial mon:stdio
+
 all:
 
 install:
