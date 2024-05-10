@@ -1,5 +1,5 @@
 QEMU := ../os/myqemu/qemu-build/riscv64-softmmu/qemu-system-riscv64
-SERIAL_CONFIG := -serial /dev/pts/4 -serial /dev/pts/7 -serial /dev/pts/5 -serial /dev/pts/8 -serial /dev/pts/10
+SERIAL_CONFIG := -serial /dev/pts/4 -serial /dev/pts/5 -serial /dev/pts/8 -serial tcp::11113,server,nowait -serial tcp:localhost:11113
 
 # QEMU := qemu-system-riscv64s
 # SERIAL_CONFIG := -serial mon:stdio

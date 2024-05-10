@@ -127,7 +127,7 @@ fn kernel_init(hart_id: usize){
 async fn async_test(_spawner: Spawner) {
     test().await;
     uart_driver_init().await;
-
+    // auto_driver_test().await;
     loop {
 
     }
@@ -138,6 +138,10 @@ async fn uart_driver_init(){
     devices::init_async_uart().await;
 }   
 
+async fn auto_driver_test(){
+    println!("auto_driver_test");
+    devices::auto_driver_test().await;
+}
 
 async fn test(){
     let f1 = async {
