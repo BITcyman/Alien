@@ -13,9 +13,16 @@ use vfscore::VfsResult;
 
 pub static UART_DEVICE: Once<Arc<dyn UartDevice>> = Once::new();
 
+pub static UART_DEVICE2: Once<Arc<dyn UartDevice>> = Once::new();
+
 pub fn init_uart(uart: Arc<dyn UartDevice>) {
     UART_DEVICE.call_once(|| uart);
 }
+
+pub fn init_uart2(uart: Arc<dyn UartDevice>) {
+    UART_DEVICE2.call_once(|| uart);
+}
+
 
 #[derive(Debug, Default)]
 pub struct IoData {

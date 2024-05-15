@@ -7,6 +7,7 @@ mod net;
 mod prob;
 mod rtc;
 mod uart;
+pub mod async_uart;
 
 extern crate alloc;
 
@@ -47,6 +48,7 @@ pub fn init_device() {
     let dtb_ptr = platform::platform_dtb_ptr();
 
     let dtb = unsafe { Fdt::from_ptr(dtb_ptr as *const u8).unwrap() };
+
     match dtb.probe_rtc() {
         Some(rtc) => init_rtc(rtc),
         None => {

@@ -51,6 +51,8 @@ fn main(hart_id: usize) {
         // register all syscall
         syscall_table::init_init_array!();
         STARTED.store(false, Ordering::Relaxed);
+
+        board_test();
     } else {
         while STARTED.load(Ordering::Relaxed) {
             spin_loop();
@@ -59,8 +61,16 @@ fn main(hart_id: usize) {
         arch::allow_access_user_memory();
         trap::init_trap_subsystem();
         println!("hart {} start", arch::hart_id());
+        
+        
     }
     time::set_next_trigger();
     println!("Begin run task...");
     task::schedule::run_task();
+}
+
+
+fn board_test(){
+    println!("board test");
+    devices::async_uart::basic_uart_test();
 }
