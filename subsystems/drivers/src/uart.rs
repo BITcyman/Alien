@@ -5,7 +5,6 @@ use alloc::collections::VecDeque;
 use alloc::sync::Arc;
 use device_interface::{DeviceBase, UartDevice};
 use ksync::Mutex;
-use platform::println;
 use shim::KTask;
 
 pub trait LowUartDriver: Send + Sync {
@@ -157,7 +156,6 @@ impl UartDevice for Uart {
 
 impl DeviceBase for Uart {
     fn hand_irq(&self) {
-        println!("uart interrput");
         loop {
             let mut inner = self.inner.lock();
             if let Some(c) = inner.0._read() {

@@ -18,7 +18,7 @@ pub fn basic_uart_test(){
     //     println!("    {}", node.name);
     // }
 
-    let (base_addr, irq) = (0x12000000, 0x2d);
+    let (base_addr, irq) = (0x10010000, 0x21);
     println!("Init addtional uart, base_addr:{:#x},irq:{}", base_addr, irq);
     
     let mut uart = Uart8250::new(base_addr);
@@ -28,8 +28,10 @@ pub fn basic_uart_test(){
 
     println!("Register new uart to plic successfullt");
     
-    println!("{:?}",uart.get());
-
+    for _ in 0..100 {
+        uart.put('c' as u8);
+    }
+    
     println!("Basic Uart Test finished");
 
 }

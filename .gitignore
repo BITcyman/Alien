@@ -14,7 +14,7 @@ target/
 kernel-qemu
 .idea
 build
-*.dts
+dts
 tools/fs.img
 *.hex
 */target

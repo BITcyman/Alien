@@ -16,11 +16,12 @@ pub static UART_DEVICE: Once<Arc<dyn UartDevice>> = Once::new();
 pub static UART_DEVICE2: Once<Arc<dyn UartDevice>> = Once::new();
 
 pub fn init_uart(uart: Arc<dyn UartDevice>) {
-    UART_DEVICE.call_once(|| uart);
+    UART_DEVICE.call_once(|| uart.clone());
+    uart.put('K' as u8);
 }
 
 pub fn init_uart2(uart: Arc<dyn UartDevice>) {
-    UART_DEVICE2.call_once(|| uart);
+    UART_DEVICE2.call_once(|| uart.clone());
 }
 
 
